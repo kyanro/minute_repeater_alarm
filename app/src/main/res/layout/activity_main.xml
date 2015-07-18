@@ -9,22 +9,5 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity">
 
-    <EditText
-        android:id="@+id/input1_etext"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="user name" />
-
-    <EditText
-        android:id="@+id/input2_etext"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="password" />
-
-
-    <TextView
-        android:id="@+id/output_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
 
 </LinearLayout>

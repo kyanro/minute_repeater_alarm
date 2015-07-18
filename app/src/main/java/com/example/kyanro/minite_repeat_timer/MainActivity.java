@@ -2,12 +2,14 @@ package com.example.kyanro.minite_repeat_timer;
 
 import android.app.Notification;
 import android.app.PendingIntent;
+import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
+import android.widget.TimePicker;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -21,34 +23,44 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        List<Long> vibratePattern = getVibratePattern(Calendar.getInstance());
-        long[] vibratePatternArray = new long[vibratePattern.size()];
-        for (int i = 0; i < vibratePattern.size(); i++) {
-            vibratePatternArray[i] = vibratePattern.get(i);
-        }
 
-        Log.d("log", vibratePattern.toString());
+        new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+//                List<Long> vibratePattern = getVibratePattern(Calendar.getInstance());
+                List<Long> vibratePattern = getVibratePattern(hourOfDay, minute);
+                long[] vibratePatternArray = new long[vibratePattern.size()];
+                for (int i = 0; i < vibratePattern.size(); i++) {
+                    vibratePatternArray[i] = vibratePattern.get(i);
+                }
 
-        Notification notification = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle("Alarm")
-                .setContentText("Alarm text")
-                .setSubText("sub title")
-                .setWhen(Calendar.getInstance().getTimeInMillis())
-                .setAutoCancel(true)
-                .setContentIntent(PendingIntent.getActivity(this, 0, new Intent(), 0))
-                .setVibrate(vibratePatternArray)
-                .build();
+                Notification notification = new NotificationCompat.Builder(MainActivity.this)
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setContentTitle("Alarm")
+                        .setContentText("Alarm text")
+                        .setSubText("hour:" + hourOfDay % 12 + " minute:" + minute)
+                        .setWhen(Calendar.getInstance().getTimeInMillis())
+                        .setAutoCancel(true)
+                        .setContentIntent(PendingIntent.getActivity(MainActivity.this, 0, new Intent(), 0))
+                        .setVibrate(vibratePatternArray)
+                        .build();
 
-        NotificationManagerCompat.from(this).notify(1, notification);
+                NotificationManagerCompat.from(MainActivity.this).notify(1, notification);
+
+                Log.d("log", vibratePattern.toString());
+
+            }
+        }, 0, 0, true).show();
+        // TODO: dialog fragment にする
+
     }
 
     private static final long SEPARATE_DURATION = 1000;
 
-    private List<Long> getVibratePattern(Calendar alarmTime) {
-        int hour = alarmTime.get(Calendar.HOUR);
-        int minuteTens = alarmTime.get(Calendar.MINUTE) / 10;
-        int minuteOnes = alarmTime.get(Calendar.MINUTE) % 10;
+    private List<Long> getVibratePattern(int hourOfDay, int minute) {
+        int hour = hourOfDay % 12;
+        int minuteTens = minute / 10;
+        int minuteOnes = minute % 10;
 
         List<Long> vibratePattern = new ArrayList<>();
         addVibratePattern(vibratePattern, hour, 500);

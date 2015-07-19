@@ -1,21 +1,19 @@
 package com.example.kyanro.minute_repeat_alarm;
 
-import android.app.Notification;
+import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
-import android.content.Intent;
+import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.NotificationCompat;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends AppCompatActivity {
 
     private TimePickerDialog mDialog;
 
@@ -24,30 +22,35 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Calendar bootTime = Calendar.getInstance();
 
         mDialog = new TimePickerDialog(this, (view, hourOfDay, minute) -> {
-            List<Long> vibratePattern = getVibratePattern(hourOfDay, minute);
-            long[] vibratePatternArray = new long[vibratePattern.size()];
-            for (int i = 0; i < vibratePattern.size(); i++) {
-                vibratePatternArray[i] = vibratePattern.get(i);
+            List<Long> vibratePatternList = getVibratePattern(hourOfDay, minute);
+            long[] vibratePattern = new long[vibratePatternList.size()];
+            for (int i = 0; i < vibratePatternList.size(); i++) {
+                vibratePattern[i] = vibratePatternList.get(i);
             }
 
-            Notification notification = new NotificationCompat.Builder(MainActivity.this)
-                    .setSmallIcon(R.mipmap.ic_launcher)
-                    .setContentTitle("Alarm")
-                    .setContentText("Alarm text")
-                    .setSubText("hour:" + hourOfDay % 12 + " minute:" + minute)
-                    .setWhen(Calendar.getInstance().getTimeInMillis())
-                    .setAutoCancel(true)
-                    .setContentIntent(PendingIntent.getActivity(MainActivity.this, 0, new Intent(), 0))
-                    .setVibrate(vibratePatternArray)
-                    .build();
+            PendingIntent alarmIntent =
+                    AlarmBroadCastReceiver.createPendingIntent(MainActivity.this, vibratePattern);
 
-            NotificationManagerCompat.from(MainActivity.this).notify(1, notification);
+            AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
-            Log.d("log", vibratePattern.toString());
+            Calendar alarmTime = Calendar.getInstance();
+            alarmTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
+            alarmTime.set(Calendar.MINUTE, minute);
+            alarmTime.set(Calendar.SECOND, 0);
 
-        }, 0, 0, true);
+            Calendar now = Calendar.getInstance();
+            if (alarmTime.getTimeInMillis() < now.getTimeInMillis()) {
+                alarmTime.add(Calendar.DAY_OF_MONTH, 1);
+            }
+
+            am.set(AlarmManager.RTC_WAKEUP, alarmTime.getTimeInMillis(), alarmIntent);
+
+            MainActivity.this.finish();
+
+        }, bootTime.get(Calendar.HOUR_OF_DAY), bootTime.get(Calendar.MINUTE), true);
         mDialog.show();
     }
 

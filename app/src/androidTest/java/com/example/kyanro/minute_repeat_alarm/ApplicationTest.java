@@ -1,4 +1,4 @@
-package com.example.kyanro.minite_repeat_timer;
+package com.example.kyanro.minute_repeat_alarm;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

@@ -21,7 +21,7 @@ public class AlarmBroadCastReceiver extends BroadcastReceiver {
         Intent intent = new Intent(c, AlarmBroadCastReceiver.class);
         intent.putExtra(EXTRA_PATTERN, vibratePattern);
 
-        return PendingIntent.getBroadcast(c, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        return PendingIntent.getBroadcast(c, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     @Override

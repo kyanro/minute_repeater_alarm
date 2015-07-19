@@ -7,7 +7,9 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -47,6 +49,11 @@ public class MainActivity extends AppCompatActivity {
             }
 
             am.set(AlarmManager.RTC_WAKEUP, alarmTime.getTimeInMillis(), alarmIntent);
+
+            SimpleDateFormat sdf = new SimpleDateFormat("M/d H:m");
+
+            Toast.makeText(MainActivity.this,
+                    "set: " + sdf.format(alarmTime.getTime()), Toast.LENGTH_LONG).show();
 
             MainActivity.this.finish();
 
